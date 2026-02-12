@@ -83,9 +83,9 @@ export default function ProductoCard({
                 </Button>
 
                 {mostrarInfo && (
-                    <button className="w-full text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                    <Button className="w-full text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
                         <span>ℹ️</span> Más información
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

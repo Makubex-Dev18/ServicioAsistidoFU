@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
 interface ItemResumenProps {
@@ -52,26 +53,26 @@ export default function ItemResumen({
         {/* Cantidad */}
         {mostrarControles ? (
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => onCambiarCantidad(id, cantidad - 1)}
               disabled={cantidad <= 1}
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Disminuir cantidad"
             >
               <Minus size={14} />
-            </button>
+            </Button>
             
             <span className="w-10 text-center font-semibold text-gray-800">
               {cantidad}x
             </span>
             
-            <button
+            <Button
               onClick={() => onCambiarCantidad(id, cantidad + 1)}
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors"
               title="Aumentar cantidad"
             >
               <Plus size={14} />
-            </button>
+            </Button>
           </div>
         ) : (
           <span className="text-sm font-medium text-gray-600">

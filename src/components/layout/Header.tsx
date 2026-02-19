@@ -12,22 +12,25 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo y Título */}
+          
+          <div className="flex justify-center">
           <Image
             src="/img/logo.png"
             alt="Logo Farmacia Universal"
-            width={150}
-            height={150}
+            width={200}
+            height={200}
             className="object-contain"
           />
-
+          </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
-              SAFU
+             {/*SAFU */}
+
             </h1>
           </div>
 
           {/* Información de sesión/hora */}
-          <div className="flex items-center space-x-6">
+          <div className="flex justify-end items-center space-x-6">
             <div className="flex items-center space-x-2 text-gray-600">
               <Clock className="w-5 h-5" />
               <span className="text-sm font-medium">

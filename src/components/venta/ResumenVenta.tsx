@@ -7,18 +7,19 @@ import { Button } from '@/components/ui/button';
 import ItemResumen from './ItemResumen';
 
 export interface ItemCarrito {
-  id: number;
-  nombre: string;
+   codigo: string;  // ← Cambio: era 'id: number', ahora es 'codigo: string'
+  descripcion: string;  // ← Cambio: era 'nombre'
   precio: number;
   cantidad: number;
   subtotal: number;
+  receta?: string ;
 }
 
 interface ResumenVentaProps {
   items: ItemCarrito[];
-  onEliminar: (id: number) => void;
+  onEliminar: (codigo: string) => void;
   onLimpiar: () => void;
-  onCambiarCantidad: (id: number, cantidad: number) => void;
+  onCambiarCantidad: (codigo: string, cantidad: number) => void;
 }
 
 export default function ResumenVenta({ 
@@ -69,9 +70,9 @@ export default function ResumenVenta({
           <div className="space-y-3">
             {items.map(item => (
               <ItemResumen
-                key={item.id}
-                id={item.id}
-                nombre={item.nombre}
+                key={item.codigo}
+                codigo={item.codigo}
+                descripcion={item.descripcion}
                 precio={item.precio}
                 cantidad={item.cantidad}
                 subtotal={item.subtotal}
@@ -123,6 +124,7 @@ export default function ResumenVenta({
       </div>
 
       {/* Nota */}
+      {/*}
       {items.length > 0 && (
         <div className="px-4 pb-4">
           <p className="text-xs text-gray-500 flex items-start gap-2">
@@ -134,6 +136,8 @@ export default function ResumenVenta({
           </p>
         </div>
       )}
+        */}
+
     </div>
   );
 }

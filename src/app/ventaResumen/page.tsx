@@ -54,7 +54,7 @@ export default function VentaResumenPage() {
       //comentado momentaneo
       // setVentaData(JSON.parse(data));
       console.log('✅ Usando datos reales del carrito');
-      setVentaData(JSON.parse(data));
+     // setVentaData(JSON.parse(data));
     } else {
       // Si no hay datos, regresar a venta
       // router.push('/venta');

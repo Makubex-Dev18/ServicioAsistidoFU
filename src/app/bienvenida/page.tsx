@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 
 export default function WelcomePage() {
   const router=useRouter();
+  
+  const handleNavegacion = () => {router.push("/venta")}
+  
   return (
    // {<RootLayout>}
       <div className="max-w-5xl mx-auto text-center py-12">
@@ -42,10 +45,10 @@ export default function WelcomePage() {
         Nuestro asistente te ayudará a encontrar productos,
         verificar disponibilidad y generar tu ticket de forma rápida y segura.
       </p>
-
+          
       <Button
-        onClick={() => router.push("/venta")}
-        className="bg-blue-600 text-white px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-blue-700 transition-all shadow-xl hover:scale-105"
+        onClick={handleNavegacion}
+        className="bg-blue-600 text-white px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-blue-700 transition-all shadow-xl hover:scale-105 touch-target animate-pulse-gentle"
       >
         INICIAR
       </Button>

@@ -4,19 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
 interface ItemResumenProps {
-  id: number;
-  nombre: string;
+  codigo: string;  // ← era 'id: number'
+  descripcion: string;  // ← era 'nombre'
   precio: number;
   cantidad: number;
   subtotal: number;
-  onEliminar: (id: number) => void;
-  onCambiarCantidad: (id: number, cantidad: number) => void;
+  onEliminar: (codigo: string) => void;  // ← era 'id: number'
+  onCambiarCantidad: (codigo: string, cantidad: number) => void;
   mostrarControles?: boolean;
 }
 
 export default function ItemResumen({
-  id,
-  nombre,
+  codigo,
+  descripcion,
   precio,
   cantidad,
   subtotal,
@@ -30,7 +30,7 @@ export default function ItemResumen({
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1">
           <p className="font-medium text-sm text-gray-800 line-clamp-2">
-            {nombre}
+            {descripcion}
           </p>
           <p className="text-xs text-gray-500 mt-1">
             S/ {precio.toFixed(2)} c/u
@@ -39,7 +39,7 @@ export default function ItemResumen({
         
         {mostrarControles && (
           <button
-            onClick={() => onEliminar(id)}
+            onClick={() => onEliminar(codigo)}
             className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
             title="Eliminar producto"
           >
@@ -54,7 +54,7 @@ export default function ItemResumen({
         {mostrarControles ? (
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => onCambiarCantidad(id, cantidad - 1)}
+              onClick={() => onCambiarCantidad(codigo, cantidad - 1)}
               disabled={cantidad <= 1}
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Disminuir cantidad"
@@ -67,7 +67,7 @@ export default function ItemResumen({
             </span>
             
             <Button
-              onClick={() => onCambiarCantidad(id, cantidad + 1)}
+              onClick={() => onCambiarCantidad(codigo, cantidad + 1)}
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors"
               title="Aumentar cantidad"
             >

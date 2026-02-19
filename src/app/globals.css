@@ -116,6 +116,11 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+ .animate-pulse-gentle {
+    animation: pulseGentle 2s ease-in-out infinite;
+  }
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -133,3 +138,8 @@
 .animate-fadeIn {
   animation: fadeIn 1s ease-out forwards;
 }
+
+@keyframes pulseGentle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }

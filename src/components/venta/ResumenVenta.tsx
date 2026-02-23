@@ -51,8 +51,10 @@ export default function ResumenVenta({
     router.push('/resumen');
   };
 
+  console.log('items del carrito:', items) // para ver la estructura real
+
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 sticky top-6">
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200 sticky top-6  max-w-xl mx-auto">
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 rounded-t-lg flex items-center gap-2">
         <ShoppingBag size={24} />
@@ -96,7 +98,7 @@ export default function ResumenVenta({
             <span className="text-gray-600">IGV (18%):</span>
             <span className="font-medium">S/ {igv.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-lg font-bold border-t pt-2">
+          <div className="flex justify-between font-bold border-t pt-2 text-2xl">
             <span>Total a Pagar:</span>
             <span className="text-blue-600">S/ {total.toFixed(2)}</span>
           </div>

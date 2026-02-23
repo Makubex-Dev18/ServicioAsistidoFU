@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+
 interface Producto {
   codigo: string;
   descripcion: string;
@@ -15,12 +16,16 @@ interface Producto {
   stockAlm: number;
   receta?: string;
   imagen_url?: string | null;
+  dtopro?: number;  // ✅ AGREGAR
 }
 
 interface ProductoCardProps {
   producto: Producto;
   onAgregar: (producto: Producto) => void;
 }
+
+
+
 
 function formatPrecio(value: Producto['precio']): string {
   const n = typeof value === 'number' ? value : Number(value);
@@ -35,9 +40,18 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
         ? { label: 'STOCK BAJO', variant: 'secondary' as const }
         : { label: 'SIN STOCK', variant: 'destructive' as const };
 
+
+// CAMBIO 2: Calcular y mostrar descuento
+const precioOriginal = formatPrecio(producto.precio);
+const tieneDescuento = producto.dtopro && producto.dtopro > 0;
+const precioFinal = tieneDescuento 
+  ? Number(precioOriginal) - producto.dtopro 
+  : Number(precioOriginal);
+
+
   const precioText = formatPrecio(producto.precio);
 
-  const alertaReceta = producto.receta == 'S' ?{label: 'Requiere Receta Medica', variant: 'destructive' as const }:
+  const alertaReceta = producto.receta == 'S' ?{label: '📋 Requiere RECETA MEDICA', variant: 'destructive' as const }:
                                                 {label: '', variant: 'secondary' as const}
 
 
@@ -62,12 +76,12 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
 
       {/* Info */}
       <div className="space-y-2">
-        <p className="font-semibold text-gray-800 line-clamp-2">
+        <p className="font-semibold text-gray-800 line-clamp-2 text-sm">
           COD: {producto.codigo}
         </p>
 
         {producto.descripcion ? (
-          <h3 className="text-xs text-gray-500 line-clamp-1">
+          <h3 className="text-xs text-gray-500 line-clamp-1 font-bold">
             {producto.descripcion}
           </h3>
         ) : null}
@@ -76,6 +90,7 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
           <Badge variant={disponibilidad.variant} className="text-xs px-2 py-0.5">
             {disponibilidad.label}
           </Badge>
+          
         </div>
 
         {/*Producto con/sin receta*/}
@@ -87,12 +102,13 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
          <Badge variant={alertaReceta.variant} className="text-xs px-2 py-0.5">
             {alertaReceta.label}
           </Badge>
+
         </div>
 
 
 
         <p className="text-sm text-gray-600">
-          Stock: <span className="font-semibold">{producto.stockAlm}</span> unidades
+          Stock Entero: <span className="font-semibold">{producto.stockAlm}</span> unidades
         </p>
 
         {/* Precio (solo una vez) */}
@@ -101,6 +117,27 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
             S/ {precioText}
           </p>
         </div>
+
+
+{tieneDescuento ? (
+  <div className="space-y-1">
+    <p className="text-sm text-gray-400 line-through">
+      S/ {precioOriginal}
+    </p>
+    <div className="flex items-baseline gap-2">
+      <p className="text-2xl font-bold text-green-600">
+        S/ {precioFinal.toFixed(2)}
+      </p>
+      <span className="text-xs text-green-600">
+        Dcto. S/ {producto.dtopro.toFixed(2)}
+      </span>
+    </div>
+  </div>
+) : (
+  <p className="text-2xl font-bold text-blue-600">
+   {/*  S/ {precioOriginal} */}
+  </p> 
+)}
 
         <Button
           onClick={() => onAgregar(producto)}

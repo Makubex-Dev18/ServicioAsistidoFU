@@ -6,6 +6,7 @@ export interface ProductoCliente {
   stockAlm: number;        // stock disponible
   receta: string;
   imagen_url?: string; // ¿necesita receta? (puede ser 'S'/'N' o true/false)
+  dtopro: number; 
 }
 
 // Para el carrito (frontend)
@@ -13,6 +14,7 @@ export interface ItemCarrito {
   codigo: string;          // código del producto
   descripcion: string;     // nombre
   precio: number;          // precio unitario
+  //precioFinal: number;  // ✅ NUEVO: Precio con descuento aplicado
   cantidad: number;        // cantidad seleccionada
   subtotal: number;        // precio * cantidad
   receta?: string; // por si necesitas validar después

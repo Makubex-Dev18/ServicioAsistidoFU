@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +7,28 @@ import ProductoCard from '@/src/components/venta/ProductoCard';
 import ResumenVenta, { ItemCarrito } from '@/src/components/venta/ResumenVenta';
 import { useState, useEffect } from 'react';
 import { ProductoCliente } from '@/src/lib/types/producto';
+import BuscadorCliente from "@/src/components/venta/BuscadorCliente";
+import { Cliente } from "@/src/lib/types/cliente";
+
 
 export default function VentaPage() {
   const [productos, setProductos] = useState<ProductoCliente[]>([]);
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [loading, setLoading] = useState(false);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
+
+
+ const handleClienteSeleccionado = (cliente: Cliente | null) => {
+    setClienteSeleccionado(cliente);
+    
+    if (cliente) {
+      console.log('📝 Cliente seleccionado:');
+      console.log('   - Código:', cliente.codcli);
+      console.log('   - Plan:', cliente.plnnum);handleBuscar 
+      console.log('   - Nombre:', cliente.nomcli);
+    }
+  };
 
   // Función para buscar productos en la API
   const handleBuscar = async (termino: string) => {
@@ -25,10 +42,19 @@ export default function VentaPage() {
 
     setLoading(true);
 
+    let url = `/api/productos/buscar?q=${encodeURIComponent(termino)}`;
+
+    if (clienteSeleccionado) {
+    url += `&plnnum=${encodeURIComponent(clienteSeleccionado.plnnum)}`;
+    url += `&codcli=${encodeURIComponent(clienteSeleccionado.codcli)}`;
+    }
+
+
     try {
       console.log('🔍 Buscando:', termino);
       
-      const res = await fetch(`/api/productos/buscar?q=${encodeURIComponent(termino)}`);
+      //const res = await fetch(`/api/productos/buscar?q=${encodeURIComponent(termino)}`);
+      const res = await fetch(url);
       const data = await res.json();
         console.log(data);
       if (data.success) {
@@ -48,6 +74,10 @@ export default function VentaPage() {
 
   // Agregar producto al carrito - validacion stock
   const handleAgregarAlCarrito = (producto: ProductoCliente) => {
+
+  // Calcular precio final
+    const precioFinal = producto.precio - (producto.dtopro || 0);
+
     const itemExistente = carrito.find(item => item.codigo === producto.codigo);
 
     if (itemExistente) {
@@ -135,14 +165,30 @@ export default function VentaPage() {
           Búsqueda y Venta de Productos
         </h1>
         <p className="text-gray-600">
-          Busca productos por nombre y agrégalos al carrito
+          Busca productos por nombre completo o DNI y agrégalos al carrito
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Columna Izquierda: Búsqueda y Productos */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Buscador */}
+
+            {/* Buscador de Cliente */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              CLIENTE
+            </label>
+            <BuscadorCliente
+              onClienteSeleccionado={handleClienteSeleccionado}
+            />
+          </div>
+
+
+
+
+
+
+          {/* Buscador Producto*/}
           <div className="bg-white p-4 rounded-lg shadow">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               BÚSQUEDA DE PRODUCTO

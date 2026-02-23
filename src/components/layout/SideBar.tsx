@@ -44,13 +44,13 @@ export default function Sidebar() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`
-          fixed left-0 top-0 h-screen bg-white shadow-lg
+          fixed left-0 top-16  h-[calc(100vh-4rem)] bg-white shadow-lg
           transition-all duration-300 ease-in-out z-50
           ${shouldExpand ? 'w-64' : 'w-20'}
         `}
       >
         {/* Header con Logo */}
-        <div className="h-20 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-500">
+      {/*  <div className="h-20 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-500">
           <div className={`
             transition-all duration-300 overflow-hidden
             ${shouldExpand ? 'w-48' : 'w-12'}
@@ -67,7 +67,7 @@ export default function Sidebar() {
             )}
           </div>
         </div>
-
+        */}
         {/* Menu Items */}
         <nav className="py-6 px-3 space-y-2">
           {menuItems.map((item) => {

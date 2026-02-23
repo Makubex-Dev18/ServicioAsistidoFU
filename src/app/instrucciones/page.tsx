@@ -4,14 +4,18 @@ import Router from "next/router";
 import { Search, TriangleAlert, Speech, Printer, BadgeCheck,MessageCircleQuestionMark } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-const Instructions = () => {
+type Props = {
+  onClose: () => void;
+};
+
+const Instructions = ({ onClose }: Props) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-slate-900 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl relative">
 
                 {/* BOTON CERRAR */}
-                <Button onClick={() => Router.back()} className="absolute top-4 right-4 bg-primary text-white px-4 py-2 rounded-lg">
+                <Button onClick={onClose} className="absolute top-4 right-4 bg-primary text-white px-4 py-2 rounded-lg">
                     Cerrar
                 </Button>
 

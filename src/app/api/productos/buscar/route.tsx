@@ -33,6 +33,14 @@ export async function GET(request: Request) {
       }
     );
     */
+// CAMBIO 1: Recibir parámetros del cliente
+const plnnum = searchParams.get('plnnum') || '000000';
+const cuscod = searchParams.get('codcli') || '0000000';
+
+
+
+
+
 // 1️⃣ Ejecutar SP (crudo)
 const productosRaw = await executeSP<any>(
   'dbo.SEL_CONSULTA_PRODUCTOS_CLIENTE_SAFU',
@@ -40,8 +48,8 @@ const productosRaw = await executeSP<any>(
     despro: `${busqueda}%`,
     codalm: '01',
     siscod: 1,
-    plnnum: '000000',
-    cuscod: '0000000',
+    plnnum: plnnum,
+    cuscod: cuscod,
     oriprg: 'VENTAS'
   }
 );
@@ -59,7 +67,7 @@ const meta = await query<{ def: string }>(
 console.log('DEF SAFU (inicio):', meta?.[0]?.def?.slice(0, 300));
 
 
-// 2️⃣ MAPEO (AQUÍ ESTÁ LA MAGIA ✨)
+// 2️⃣ MAPEO ()
 const productos: ProductoCliente[] = productosRaw.map((p: any) => ({
   codigo: p.codigo ?? p.codpro ?? '',
   descripcion: p.descripcion ?? p.despro ?? '',
@@ -67,6 +75,7 @@ const productos: ProductoCliente[] = productosRaw.map((p: any) => ({
   stockAlm: Number(p.stockAlm ?? p.stock ?? 0),
   receta: p.receta ?? undefined,
   imagen_url: p.imagen_url ?? undefined,
+  dtopro: Number(p.dtopro ?? 0),  // ✅ AGREGAR
 }));
 
 

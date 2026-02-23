@@ -36,7 +36,7 @@ export default function RootLayout({
           {/* Header/Navbar superior */}
           <Header/>
 
-          <div className="flex min-h-screen bg-gray-100">
+          <div className="flex pt-16 min-h-screen bg-gray-100">
             {/* Sidebar lateral (menú) */}
             <Sidebar/>
 

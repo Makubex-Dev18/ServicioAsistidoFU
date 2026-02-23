@@ -8,29 +8,23 @@ const Header = () => {
 
   return (
 
-    <header className="bg-white shadow-sm border-b-2 border-blue-600">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b-2 border-blue-600">
+      <div className="w-full px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
           {/* Logo y Título */}
           
-          <div className="flex justify-center">
+          <div className="flex-shrink-0">
           <Image
             src="/img/logo.png"
             alt="Logo Farmacia Universal"
-            width={200}
-            height={200}
-            className="object-contain"
+            width={160}
+            height={50}
+            className="object-contain h-10 w-auto sm:h-12"
           />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-             {/*SAFU */}
-
-            </h1>
-          </div>
-
+          
           {/* Información de sesión/hora */}
-          <div className="flex justify-end items-center space-x-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             <div className="flex items-center space-x-2 text-gray-600">
               <Clock className="w-5 h-5" />
               <span className="text-sm font-medium">

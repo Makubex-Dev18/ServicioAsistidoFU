@@ -17,8 +17,8 @@ const config: sql.config = {
     min: 0,
     idleTimeoutMillis: 30000
   },
-  connectionTimeout: 15000, // 15 segundos
-  requestTimeout: 15000, // 15 segundos
+  connectionTimeout: 30000, // 15 segundos
+  requestTimeout: 60000, // 15 segundos
 };
 
 // Pool de conexiones (singleton)

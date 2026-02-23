@@ -81,7 +81,7 @@ export default function ItemResumen({
         )}
 
         {/* Subtotal */}
-        <p className="font-bold text-blue-600">
+        <p className="font-bold text-blue-600 text-xl">
           S/ {subtotal.toFixed(2)}
         </p>
       </div>

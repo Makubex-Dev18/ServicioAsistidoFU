@@ -4,22 +4,23 @@ import { useRouter } from 'next/navigation';
 
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ItemResumen from './ItemResumen';
+import ItemResumen from '@/src/components/venta/ItemResumen';
 
 export interface ItemCarrito {
-   codigo: string;  // ← Cambio: era 'id: number', ahora es 'codigo: string'
-  descripcion: string;  // ← Cambio: era 'nombre'
+  codigo: string;
+  descripcion: string;
   precio: number;
   cantidad: number;
   subtotal: number;
-  receta?: string ;
+  receta?: string;
+  tipoVenta: 'entero' | 'fraccion';  // ✅ NUEVO
 }
 
 interface ResumenVentaProps {
   items: ItemCarrito[];
   onEliminar: (codigo: string) => void;
   onLimpiar: () => void;
-  onCambiarCantidad: (codigo: string, cantidad: number) => void;
+  onCambiarCantidad: (codigo: string, cantidad: number, tipoVenta?: 'entero' | 'fraccion') => void;  // ✅ Actualizado
 }
 
 export default function ResumenVenta({ 
@@ -32,8 +33,11 @@ export default function ResumenVenta({
 
   // Cálculos
   const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
-  const igv = subtotal * 0.18;
-  const total = subtotal + igv;
+  //const igv = subtotal * 0.18;
+  //const total = subtotal + igv;
+ const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+ const igv = total * (18 / 118);  // Extraer IGV del total
+ const base = total - igv;         // Base imponible (sin IGV)
 
   const handleGenerarTicket = () => {
     if (items.length === 0) return;
@@ -72,12 +76,13 @@ export default function ResumenVenta({
           <div className="space-y-3">
             {items.map(item => (
               <ItemResumen
-                key={item.codigo}
+                key={`${item.codigo}-${item.tipoVenta}`}
                 codigo={item.codigo}
                 descripcion={item.descripcion}
                 precio={item.precio}
                 cantidad={item.cantidad}
                 subtotal={item.subtotal}
+                tipoVenta={item.tipoVenta}  // ✅ Pasar tipoVenta
                 onEliminar={onEliminar}
                 onCambiarCantidad={onCambiarCantidad}
                 mostrarControles={true}
@@ -91,13 +96,14 @@ export default function ResumenVenta({
       {items.length > 0 && (
         <div className="border-t p-4 space-y-2 bg-gray-50">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal:</span>
-            <span className="font-medium">S/ {subtotal.toFixed(2)}</span>
+            <span className="text-gray-600">T-parcial:</span>
+            <span className="font-medium">S/ {base.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">IGV (18%):</span>
             <span className="font-medium">S/ {igv.toFixed(2)}</span>
           </div>
+          
           <div className="flex justify-between font-bold border-t pt-2 text-2xl">
             <span>Total a Pagar:</span>
             <span className="text-blue-600">S/ {total.toFixed(2)}</span>

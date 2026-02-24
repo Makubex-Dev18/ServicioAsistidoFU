@@ -1,11 +1,10 @@
-
 "use client";
 
 import { Badge } from "@/components/ui/badge";
 import BuscadorProducto from '@/src/components/venta/BuscadorProducto';
 import ProductoCard from '@/src/components/venta/ProductoCard';
 import ResumenVenta, { ItemCarrito } from '@/src/components/venta/ResumenVenta';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ProductoCliente } from '@/src/lib/types/producto';
 import BuscadorCliente from "@/src/components/venta/BuscadorCliente";
 import { Cliente } from "@/src/lib/types/cliente";
@@ -19,13 +18,13 @@ export default function VentaPage() {
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
 
 
- const handleClienteSeleccionado = (cliente: Cliente | null) => {
+  const handleClienteSeleccionado = (cliente: Cliente | null) => {
     setClienteSeleccionado(cliente);
     
     if (cliente) {
       console.log('📝 Cliente seleccionado:');
       console.log('   - Código:', cliente.codcli);
-      console.log('   - Plan:', cliente.plnnum);handleBuscar 
+      console.log('   - Plan:', cliente.plnnum);
       console.log('   - Nombre:', cliente.nomcli);
     }
   };
@@ -45,18 +44,17 @@ export default function VentaPage() {
     let url = `/api/productos/buscar?q=${encodeURIComponent(termino)}`;
 
     if (clienteSeleccionado) {
-    url += `&plnnum=${encodeURIComponent(clienteSeleccionado.plnnum)}`;
-    url += `&codcli=${encodeURIComponent(clienteSeleccionado.codcli)}`;
+      url += `&plnnum=${encodeURIComponent(clienteSeleccionado.plnnum)}`;
+      url += `&codcli=${encodeURIComponent(clienteSeleccionado.codcli)}`;
     }
-
 
     try {
       console.log('🔍 Buscando:', termino);
       
-      //const res = await fetch(`/api/productos/buscar?q=${encodeURIComponent(termino)}`);
       const res = await fetch(url);
       const data = await res.json();
-        console.log(data);
+      console.log(data);
+      
       if (data.success) {
         console.log(`✅ Encontrados ${data.count} productos`);
         setProductos(data.data);
@@ -72,27 +70,33 @@ export default function VentaPage() {
     }
   };
 
-  // Agregar producto al carrito - validacion stock
-  const handleAgregarAlCarrito = (producto: ProductoCliente) => {
+  // ✅ Agregar producto al carrito - CON SOPORTE ENTERO/FRACCIÓN
+  const handleAgregarAlCarrito = (producto: ProductoCliente, tipoVenta: 'entero' | 'fraccion') => {
+    // ✅ Obtener precio y stock según tipo
+    const precioFinal = tipoVenta === 'entero'
+      ? producto.PVP_F      // Precio entero con descuento
+      : producto.PVP_F_U;   // Precio fracción con descuento
+      
+    const stock = tipoVenta === 'entero'
+      ? producto.stockAlm    // Stock entero
+      : producto.stockAlm_m; // Stock fraccionado
 
-  // Calcular precio final
-    const precioFinal = producto.precio - (producto.dtopro || 0);
-
-    const itemExistente = carrito.find(item => item.codigo === producto.codigo);
+    // ✅ Buscar si ya existe EL MISMO PRODUCTO CON EL MISMO TIPO
+    const itemExistente = carrito.find(
+      item => item.codigo === producto.codigo && item.tipoVenta === tipoVenta
+    );
 
     if (itemExistente) {
-        
-        const nuevaCantidad = itemExistente.cantidad + 1;
+      const nuevaCantidad = itemExistente.cantidad + 1;
 
-        if(nuevaCantidad > producto.stockAlm){
-            alert(`⚠️ Stock insuficiente. Solo hay ${producto.stockAlm} unidades disponibles.`);
-            return;
-        }
-
+      if (nuevaCantidad > stock) {
+        alert(`⚠️ Stock insuficiente. Solo hay ${stock} ${tipoVenta === 'entero' ? 'cajas' : 'unidades'} disponibles.`);
+        return;
+      }
 
       // Incrementar cantidad
       setCarrito(carrito.map(item =>
-        item.codigo === producto.codigo
+        item.codigo === producto.codigo && item.tipoVenta === tipoVenta
           ? {
               ...item,
               cantidad: item.cantidad + 1,
@@ -101,26 +105,35 @@ export default function VentaPage() {
           : item
       ));
       
-      console.log(`➕ Incrementada cantidad de ${producto.descripcion}`);
+      console.log(`➕ Incrementada cantidad de ${producto.descripcion} (${tipoVenta})`);
     } else {
+      if (stock < 1) {
+        alert(`⚠️ Producto sin stock ${tipoVenta === 'entero' ? 'entero' : 'fraccionado'}.`);
+        return;
+      }
 
-        if(producto.stockAlm < 1 ){
-            alert('⚠️ Producto sin stock disponible.');
-            return;
-        }
-
-      // Agregar nuevo item
+      // ✅ Agregar nuevo item con tipo de venta
+      const etiquetaTipo = tipoVenta === 'fraccion' ? ' (UNIDAD)' : ' (CAJA)';
+      
       const nuevoItem: ItemCarrito = {
         codigo: producto.codigo,
-        descripcion: producto.descripcion,
-        precio: producto.precio,
+        descripcion: `${producto.descripcion}${etiquetaTipo}`,
+        precio: precioFinal,
         cantidad: 1,
-        subtotal: producto.precio,
-        receta: producto.receta
+        subtotal: precioFinal,
+        receta: producto.receta,
+        tipoVenta: tipoVenta  // ✅ GUARDAR TIPO
       };
       
       setCarrito([...carrito, nuevoItem]);
-      console.log(`✅ Agregado ${producto.descripcion} al carrito`);
+      
+      // ✅ Log para debug
+      console.log(`✅ Agregado ${producto.descripcion} (${tipoVenta})`);
+      console.log(`   Precio: S/ ${precioFinal.toFixed(2)}`);
+      console.log(`   Stock disponible: ${stock} ${tipoVenta === 'entero' ? 'cajas' : 'unidades'}`);
+      if (producto.dtopro > 0) {
+        console.log(`   Descuento: ${producto.dtopro}%`);
+      }
     }
   };
 
@@ -129,19 +142,30 @@ export default function VentaPage() {
     console.log(`🗑️ Eliminado producto del carrito`);
   };
 
-  const handleCambiarCantidad = (codigo: string, nuevaCantidad: number) => {
+  // ✅ Actualizar handleCambiarCantidad para validar con tipoVenta
+  const handleCambiarCantidad = (codigo: string, nuevaCantidad: number, tipoVenta?: 'entero' | 'fraccion') => {
     if (nuevaCantidad < 1) return;
     
-     // Buscar el producto en la lista para verificar stock
-  const producto = productos.find(p => p.codigo === codigo);
-  
-  if (producto && nuevaCantidad > producto.stockAlm) {
-    alert(`⚠️ Stock insuficiente. Solo hay ${producto.stockAlm} unidades disponibles.`);
-    return;
-  }
+    // ✅ Buscar en el carrito para saber el tipo
+    const itemCarrito = carrito.find(item => item.codigo === codigo && item.tipoVenta === tipoVenta);
+    if (!itemCarrito) return;
+    
+    // ✅ Buscar el producto en la lista para verificar stock
+    const producto = productos.find(p => p.codigo === codigo);
+    
+    if (producto) {
+      const stock = itemCarrito.tipoVenta === 'entero'
+        ? producto.stockAlm
+        : producto.stockAlm_m;
+      
+      if (nuevaCantidad > stock) {
+        alert(`⚠️ Stock insuficiente. Solo hay ${stock} ${itemCarrito.tipoVenta === 'entero' ? 'cajas' : 'unidades'} disponibles.`);
+        return;
+      }
+    }
 
     setCarrito(carrito.map(item =>
-      item.codigo === codigo
+      item.codigo === codigo && item.tipoVenta === itemCarrito.tipoVenta
         ? {
             ...item,
             cantidad: nuevaCantidad,
@@ -173,7 +197,7 @@ export default function VentaPage() {
         {/* Columna Izquierda: Búsqueda y Productos */}
         <div className="lg:col-span-2 space-y-4">
 
-            {/* Buscador de Cliente */}
+          {/* Buscador de Cliente */}
           <div className="bg-white p-4 rounded-lg shadow">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               CLIENTE
@@ -183,11 +207,6 @@ export default function VentaPage() {
             />
           </div>
 
-
-
-
-
-
           {/* Buscador Producto*/}
           <div className="bg-white p-4 rounded-lg shadow">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -195,7 +214,6 @@ export default function VentaPage() {
             </label>
             <BuscadorProducto
               onBuscar={handleBuscar}
-              //placeholder="Escribe el nombre del producto (ej: PANADOL)..."
             />
           </div>
 
@@ -261,4 +279,4 @@ export default function VentaPage() {
       </div>
     </div>
   );
-} 
+}

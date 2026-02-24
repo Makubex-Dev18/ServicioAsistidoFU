@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
 interface ItemResumenProps {
-  codigo: string;  // ← era 'id: number'
-  descripcion: string;  // ← era 'nombre'
+  codigo: string;
+  descripcion: string;
   precio: number;
   cantidad: number;
   subtotal: number;
-  onEliminar: (codigo: string) => void;  // ← era 'id: number'
-  onCambiarCantidad: (codigo: string, cantidad: number) => void;
+  tipoVenta?: 'entero' | 'fraccion';  // ✅ AGREGAR
+  onEliminar: (codigo: string) => void;
+  onCambiarCantidad: (codigo: string, cantidad: number, tipoVenta?: 'entero' | 'fraccion') => void;  // ✅ ACTUALIZAR
   mostrarControles?: boolean;
 }
 
@@ -20,6 +21,7 @@ export default function ItemResumen({
   precio,
   cantidad,
   subtotal,
+  tipoVenta,  // ✅ RECIBIR
   onEliminar,
   onCambiarCantidad,
   mostrarControles = true
@@ -54,7 +56,7 @@ export default function ItemResumen({
         {mostrarControles ? (
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => onCambiarCantidad(codigo, cantidad - 1)}
+              onClick={() => onCambiarCantidad(codigo, cantidad - 1, tipoVenta)}  // ✅ PASAR tipoVenta
               disabled={cantidad <= 1}
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Disminuir cantidad"
@@ -67,7 +69,7 @@ export default function ItemResumen({
             </span>
             
             <Button
-              onClick={() => onCambiarCantidad(codigo, cantidad + 1)}
+              onClick={() => onCambiarCantidad(codigo, cantidad + 1, tipoVenta)}  // ✅ PASAR tipoVenta
               className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors"
               title="Aumentar cantidad"
             >

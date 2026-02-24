@@ -75,14 +75,20 @@ const productos: ProductoCliente[] = productosRaw.map((p: any) => ({
   stockAlm: Number(p.stockAlm ?? p.stock ?? 0),
   receta: p.receta ?? undefined,
   imagen_url: p.imagen_url ?? undefined,
-  dtopro: Number(p.dtopro ?? 0),  // ✅ AGREGAR
+  dtopro: Number(p.dtopro ?? 0), 
+  productoLab: p.productoLab ?? p.laboratorio ?? p.lab ?? undefined,   
+  productoEstado: p.productoEstado ?? p.estado ?? undefined,         
+  productoStkfra: Number(p.productoStkfra ?? p.stkfra ?? 0),    
+  PVP_F: Number(p.PVP_F ?? p.precio ?? 0),  // ✅ AGREGAR
+  stockAlm_m: Number(p.stockAlm_m ?? p.stock ?? 0),
+  PVP_F_U: Number(p.PVP_F_U ?? 0),
 }));
 
 
 
 
 
-console.log('🔥 API EJECUTADA:', new Date().toISOString());
+console.log('API EJECUTADA:', new Date().toISOString());
 
     console.log(`✅ Encontrados ${productos.length} productos`);
     console.log(productos[0]);

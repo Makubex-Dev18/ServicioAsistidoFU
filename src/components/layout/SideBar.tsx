@@ -3,15 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { 
+import {
   Home,
-  ShoppingCart, 
-  Package, 
+  ShoppingCart,
+  Package,
   Warehouse,
-  BarChart3, 
+  BarChart3,
   Settings,
   Menu,
-  X
+  X,
+  UserRoundPlus
 } from 'lucide-react';
 
 interface MenuItem {
@@ -24,6 +25,7 @@ const menuItems: MenuItem[] = [
   { name: 'Inicio', href: '/', icon: <Home size={24} /> },
   { name: 'Venta', href: '/venta', icon: <ShoppingCart size={24} /> },
   { name: 'Productos', href: '/productos', icon: <Package size={24} /> },
+  { name: 'Clientes', href: '/clientes', icon: <UserRoundPlus size={24} /> },
   //{ name: 'Inventario', href: '/inventario', icon: <Warehouse size={24} /> },
   //{ name: 'Reportes', href: '/reportes', icon: <BarChart3 size={24} /> },
   { name: 'Configuración', href: '/configuracion', icon: <Settings size={24} /> },
@@ -50,7 +52,7 @@ export default function Sidebar() {
         `}
       >
         {/* Header con Logo */}
-      {/*  <div className="h-20 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-500">
+        {/*  <div className="h-20 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-500">
           <div className={`
             transition-all duration-300 overflow-hidden
             ${shouldExpand ? 'w-48' : 'w-12'}
@@ -72,7 +74,7 @@ export default function Sidebar() {
         <nav className="py-6 px-3 space-y-2">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
-            
+
             return (
               <Link
                 key={item.href}
@@ -80,8 +82,8 @@ export default function Sidebar() {
                 className={`
                   flex items-center gap-4 px-4 py-3.5 rounded-xl 
                   transition-all duration-200 group relative
-                  ${isActive 
-                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/50' 
+                  ${isActive
+                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/50'
                     : 'text-gray-700 hover:bg-gray-100'
                   }
                 `}
@@ -97,8 +99,8 @@ export default function Sidebar() {
                 {/* Text */}
                 <span className={`
                   font-medium whitespace-nowrap transition-all duration-300
-                  ${shouldExpand 
-                    ? 'opacity-100 w-auto' 
+                  ${shouldExpand
+                    ? 'opacity-100 w-auto'
                     : 'opacity-0 w-0 overflow-hidden'
                   }
                 `}>
@@ -135,7 +137,7 @@ export default function Sidebar() {
         </div>
 
         {/* Hover Indicator */}
-       {/*  {isHovered && !isExpanded && (
+        {/*  {isHovered && !isExpanded && (
           <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2">
             <div className="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-lg shadow-lg">
               Pasa el mouse para expandir

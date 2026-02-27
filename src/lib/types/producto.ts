@@ -12,7 +12,8 @@ export interface ProductoCliente {
   productoStkfra: number; //producto stock fracionado
   PVP_F: number;  //producto precio entero 
   stockAlm_m: number; //stock fracionado disponible
-  PVP_F_U: number; //producto precio fraccionado
+  PVP_F_U: number; //producto precio fraccionado,
+  canven: number; //canven 
 }
 
 // Para el carrito (frontend)

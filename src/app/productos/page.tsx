@@ -2,19 +2,27 @@
 
 import { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { ProductoLaboratorio } from '@/src/lib/types/productoLaboratorio';
 import TablaResultados from '@/src/components/productos/TablaResultados';
 import PanelInfoFarmacologica from '@/src/components/productos/PanelInfoFarmacologica';
+import ModalConfirmacion from '@/src/components/productos/ModalConfirmacion';
 
 type TipoBusqueda = 'laboratorio' | 'principio-activo';
 
 export default function ProductosPage() {
+  const router = useRouter();
   const [tipoBusqueda, setTipoBusqueda] = useState<TipoBusqueda>('laboratorio');
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [productos, setProductos] = useState<ProductoLaboratorio[]>([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState<ProductoLaboratorio | null>(null);
   const [loading, setLoading] = useState(false);
   const [mostrarInfo, setMostrarInfo] = useState(false);
+
+  // Estado para modal de confirmación
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [productoParaAgregar, setProductoParaAgregar] = useState<ProductoLaboratorio | null>(null);
+
 
   const handleBuscar = async () => {
     if (!terminoBusqueda.trim()) {
@@ -67,6 +75,29 @@ export default function ProductosPage() {
       setMostrarInfo(false);
     }
   };
+
+  // Handler para abrir modal de confirmación
+  const handleAgregarCarrito = (producto: ProductoLaboratorio) => {
+    setProductoParaAgregar(producto);
+    setModalAbierto(true);
+  };
+
+  // Handler para confirmar y navegar a venta
+  const handleConfirmarAgregar = () => {
+    if (!productoParaAgregar) return;
+
+    // Guardar código en localStorage
+    localStorage.setItem('codigoBuscar', productoParaAgregar.codpro);
+    
+    console.log('✅ Código guardado:', productoParaAgregar.codpro);
+    
+    // Cerrar modal
+    setModalAbierto(false);
+    
+    // Navegar a venta
+    router.push('/venta');
+  };
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -158,6 +189,7 @@ export default function ProductosPage() {
             productos={productos}
             productoSeleccionado={productoSeleccionado}
             onSeleccionar={handleSeleccionarProducto}
+            onAgregarCarrito={handleAgregarCarrito}
           />
         </div>
 
@@ -172,6 +204,16 @@ export default function ProductosPage() {
           </div>
         )}
       </div>
+
+      
+      {/* Modal de confirmación */}
+      <ModalConfirmacion
+        isOpen={modalAbierto}
+        onClose={() => setModalAbierto(false)}
+        onConfirm={handleConfirmarAgregar}
+        nombreProducto={productoParaAgregar?.despro || ''}
+        codigoProducto={productoParaAgregar?.codpro || ''}
+      />
     </div>
   );
 }

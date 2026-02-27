@@ -4,19 +4,87 @@ import { Badge } from "@/components/ui/badge";
 import BuscadorProducto from '@/src/components/venta/BuscadorProducto';
 import ProductoCard from '@/src/components/venta/ProductoCard';
 import ResumenVenta, { ItemCarrito } from '@/src/components/venta/ResumenVenta';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProductoCliente } from '@/src/lib/types/producto';
 import BuscadorCliente from "@/src/components/venta/BuscadorCliente";
 import { Cliente } from "@/src/lib/types/cliente";
-
+import { useRouter } from 'next/navigation';
+import { UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function VentaPage() {
+  const router = useRouter();
   const [productos, setProductos] = useState<ProductoCliente[]>([]);
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [loading, setLoading] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
 
+  // ✅✅✅ NUEVO: Cargar carrito y cliente al montar la página ✅✅✅
+  useEffect(() => {
+    console.log('🔄 Cargando datos guardados...');
+    
+    let clienteCargado: Cliente | null = null;
+    
+    // 1. Cargar cliente PRIMERO (guardarlo en variable local)
+    const clienteGuardado = localStorage.getItem('clienteSeleccionado');
+    if (clienteGuardado) {
+      try {
+        clienteCargado = JSON.parse(clienteGuardado);
+        setClienteSeleccionado(clienteCargado);
+        console.log('📋 Cliente restaurado:', clienteCargado.nomcli);
+      } catch (error) {
+        console.error('❌ Error al cargar cliente:', error);
+      }
+    }
+
+    // 2. Cargar carrito de localStorage
+    const carritoGuardado = localStorage.getItem('carritoVenta');
+    if (carritoGuardado) {
+      try {
+        const items = JSON.parse(carritoGuardado);
+        setCarrito(items);
+        console.log('🛒 Carrito restaurado:', items.length, 'items');
+      } catch (error) {
+        console.error('❌ Error al cargar carrito:', error);
+      }
+    }
+
+    // 3. Búsqueda automática (desde módulo productos)
+    // ✅ PASAR clienteCargado como parámetro
+    const codigoBuscar = localStorage.getItem('codigoBuscar');
+    if (codigoBuscar) {
+      console.log('🔍 Búsqueda automática del código:', codigoBuscar);
+      if (clienteCargado) {
+        console.log('📋 Aplicando descuentos de cliente:', clienteCargado.nomcli);
+      }
+      // ✅✅✅ PASAR EL CLIENTE CARGADO ✅✅✅
+      handleBuscar(codigoBuscar, clienteCargado);
+      localStorage.removeItem('codigoBuscar');
+    }
+  }, []); // ← Se ejecuta solo al montar
+
+  // ✅✅✅ NUEVO: Guardar carrito cuando cambie ✅✅✅
+  useEffect(() => {
+    if (carrito.length > 0) {
+      localStorage.setItem('carritoVenta', JSON.stringify(carrito));
+      console.log('💾 Carrito guardado:', carrito.length, 'items');
+    } else {
+      localStorage.removeItem('carritoVenta');
+      console.log('🗑️ Carrito vacío, localStorage limpiado');
+    }
+  }, [carrito]);
+
+  // ✅✅✅ NUEVO: Guardar cliente cuando cambie ✅✅✅
+  useEffect(() => {
+    if (clienteSeleccionado) {
+      localStorage.setItem('clienteSeleccionado', JSON.stringify(clienteSeleccionado));
+      console.log('💾 Cliente guardado:', clienteSeleccionado.nomcli);
+    } else {
+      localStorage.removeItem('clienteSeleccionado');
+      console.log('🗑️ Cliente deseleccionado, localStorage limpiado');
+    }
+  }, [clienteSeleccionado]);
 
   const handleClienteSeleccionado = (cliente: Cliente | null) => {
     setClienteSeleccionado(cliente);
@@ -29,11 +97,10 @@ export default function VentaPage() {
     }
   };
 
-  // Función para buscar productos en la API
-  const handleBuscar = async (termino: string) => {
+  // ✅✅✅ MODIFICADO: Aceptar cliente como parámetro opcional ✅✅✅
+  const handleBuscar = async (termino: string, clienteParam?: Cliente | null) => {
     setTerminoBusqueda(termino);
     
-    // Si está vacío, limpiar resultados
     if (!termino.trim()) {
       setProductos([]);
       return;
@@ -41,15 +108,23 @@ export default function VentaPage() {
 
     setLoading(true);
 
+    // ✅ Usar clienteParam si se pasó, sino usar el estado
+    const clienteParaBuscar = clienteParam !== undefined ? clienteParam : clienteSeleccionado;
+
     let url = `/api/productos/buscar?q=${encodeURIComponent(termino)}`;
 
-    if (clienteSeleccionado) {
-      url += `&plnnum=${encodeURIComponent(clienteSeleccionado.plnnum)}`;
-      url += `&codcli=${encodeURIComponent(clienteSeleccionado.codcli)}`;
+    // ✅ Usar clienteParaBuscar en lugar de clienteSeleccionado
+    if (clienteParaBuscar) {
+      url += `&plnnum=${encodeURIComponent(clienteParaBuscar.plnnum)}`;
+      url += `&codcli=${encodeURIComponent(clienteParaBuscar.codcli)}`;
+      console.log('📋 Buscando con descuento de cliente:', clienteParaBuscar.nomcli);
+    } else {
+      console.log('🔍 Buscando sin cliente (sin descuentos)');
     }
 
     try {
       console.log('🔍 Buscando:', termino);
+      console.log('🔗 URL:', url);
       
       const res = await fetch(url);
       const data = await res.json();
@@ -70,18 +145,15 @@ export default function VentaPage() {
     }
   };
 
-  // ✅ Agregar producto al carrito - CON SOPORTE ENTERO/FRACCIÓN
   const handleAgregarAlCarrito = (producto: ProductoCliente, tipoVenta: 'entero' | 'fraccion') => {
-    // ✅ Obtener precio y stock según tipo
     const precioFinal = tipoVenta === 'entero'
-      ? producto.PVP_F      // Precio entero con descuento
-      : producto.PVP_F_U;   // Precio fracción con descuento
+      ? producto.PVP_F
+      : producto.PVP_F_U;
       
     const stock = tipoVenta === 'entero'
-      ? producto.stockAlm    // Stock entero
-      : producto.stockAlm_m; // Stock fraccionado
+      ? producto.stockAlm
+      : producto.stockAlm_m;
 
-    // ✅ Buscar si ya existe EL MISMO PRODUCTO CON EL MISMO TIPO
     const itemExistente = carrito.find(
       item => item.codigo === producto.codigo && item.tipoVenta === tipoVenta
     );
@@ -94,7 +166,6 @@ export default function VentaPage() {
         return;
       }
 
-      // Incrementar cantidad
       setCarrito(carrito.map(item =>
         item.codigo === producto.codigo && item.tipoVenta === tipoVenta
           ? {
@@ -112,8 +183,6 @@ export default function VentaPage() {
         return;
       }
 
-      // ✅ Agregar nuevo item con tipo de venta
-      //const etiquetaTipo = tipoVenta === 'fraccion' ? ' (UNIDAD)' : ' (CAJA)';
       const etiquetaTipo = tipoVenta === 'fraccion' ? ' (Fraccion)' : ' (Entero)';
       
       const nuevoItem: ItemCarrito = {
@@ -123,12 +192,11 @@ export default function VentaPage() {
         cantidad: 1,
         subtotal: precioFinal,
         receta: producto.receta,
-        tipoVenta: tipoVenta  // ✅ GUARDAR TIPO
+        tipoVenta: tipoVenta
       };
       
       setCarrito([...carrito, nuevoItem]);
       
-      // ✅ Log para debug
       console.log(`✅ Agregado ${producto.descripcion} (${tipoVenta})`);
       console.log(`   Precio: S/ ${precioFinal.toFixed(2)}`);
       console.log(`   Stock disponible: ${stock} ${tipoVenta === 'entero' ? 'cajas' : 'unidades'}`);
@@ -143,15 +211,12 @@ export default function VentaPage() {
     console.log(`🗑️ Eliminado producto del carrito`);
   };
 
-  // ✅ Actualizar handleCambiarCantidad para validar con tipoVenta
   const handleCambiarCantidad = (codigo: string, nuevaCantidad: number, tipoVenta?: 'entero' | 'fraccion') => {
     if (nuevaCantidad < 1) return;
     
-    // ✅ Buscar en el carrito para saber el tipo
     const itemCarrito = carrito.find(item => item.codigo === codigo && item.tipoVenta === tipoVenta);
     if (!itemCarrito) return;
     
-    // ✅ Buscar el producto en la lista para verificar stock
     const producto = productos.find(p => p.codigo === codigo);
     
     if (producto) {
@@ -183,6 +248,10 @@ export default function VentaPage() {
     }
   };
 
+  const handleRegistrarCliente = () => {
+    router.push('/clientes');
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
@@ -195,20 +264,27 @@ export default function VentaPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Columna Izquierda: Búsqueda y Productos */}
         <div className="lg:col-span-2 space-y-4">
-
-          {/* Buscador de Cliente */}
           <div className="bg-white p-4 rounded-lg shadow">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              CLIENTE
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-gray-700">
+                CLIENTE
+              </label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRegistrarCliente}
+                className="flex items-center gap-2"
+              >
+                <UserPlus size={16} />
+                Registrar Cliente
+              </Button>
+            </div>
             <BuscadorCliente
               onClienteSeleccionado={handleClienteSeleccionado}
             />
           </div>
 
-          {/* Buscador Producto*/}
           <div className="bg-white p-4 rounded-lg shadow">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               BÚSQUEDA DE PRODUCTO
@@ -218,7 +294,6 @@ export default function VentaPage() {
             />
           </div>
 
-          {/* Sección de productos */}
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -234,7 +309,6 @@ export default function VentaPage() {
               )}
             </div>
 
-            {/* Grid de productos */}
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -268,7 +342,6 @@ export default function VentaPage() {
           </div>
         </div>
 
-        {/* Columna Derecha: Resumen */}
         <div className="lg:col-span-1">
           <ResumenVenta
             items={carrito}

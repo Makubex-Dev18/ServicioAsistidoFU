@@ -108,7 +108,7 @@ export default function VentaResumenPage() {
     // Limpiar y volver
     localStorage.removeItem('ventaActual');
     alert('✅ Ticket generado exitosamente');
-    router.push('/venta');
+    router.push('/despedida');
   };
 
   const handleRegresar = () => {
@@ -130,9 +130,10 @@ export default function VentaResumenPage() {
         <h1 className="text-4xl font-bold text-gray-800 mb-2">
           FINALIZAR ATENCIÓN
         </h1>
-        <p className="text-gray-600">
+       {/* <p className="text-gray-600">
           Revise el resumen antes de generar el ticket de pago.
         </p>
+        */}
       </div>
 
       {/* Grid 2 columnas */}
@@ -188,7 +189,7 @@ export default function VentaResumenPage() {
       </div>
 
       {/* Botón Principal */}
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex justify-end w-full">
         <Button
           onClick={handleGenerarTicket}
           variant="default"
@@ -196,7 +197,7 @@ export default function VentaResumenPage() {
           className='bg-blue-600 text-white px-8 py-6'
         >
           <Printer size={20} className="mr-2" />
-          GENERAR E IMPRIMIR TICKET
+          IMPRIMIR TICKET DE PAGO
         </Button>
       </div>
 
@@ -211,14 +212,14 @@ export default function VentaResumenPage() {
               INSTRUCCIÓN PARA EL PERSONAL:
             </p>
             <p className="text-sm text-blue-800">
-              Entregue el ticket impreso al cliente y diríjalo amablemente a la zona de cajas para procesar el pago.
+              Entregue el ticket pequeño impreso al cliente y el otro al personal de despacho, diríja al cliente amablemente a la zona de cajas para proceder al pago.
             </p>
           </div>
         </div>
       </div>
-
+    
       {/* Botón Regresar */}
-      <div className="text-center">
+   {/*   <div className="text-center">
         <Button variant={'default'}
           onClick={handleRegresar}
          
@@ -227,6 +228,7 @@ export default function VentaResumenPage() {
           REGRESAR AL PASO ANTERIOR
         </Button>
       </div>
+    */}
     </div>
   );
 }

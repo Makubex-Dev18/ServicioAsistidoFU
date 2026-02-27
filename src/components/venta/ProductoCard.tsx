@@ -72,7 +72,7 @@ export default function ProductoCard({ producto, onAgregar }: ProductoCardProps)
           )}{' '}
           {producto.productoStkfra !== undefined && (
             <span className="text-gray-600">(B:{producto.productoStkfra})</span>
-          )}
+          )} <span className="text-gray-600">({producto.canven})</span>
         </p>
 
         {/* Descripción */}

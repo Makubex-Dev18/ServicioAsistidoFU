@@ -79,9 +79,10 @@ const productos: ProductoCliente[] = productosRaw.map((p: any) => ({
   productoLab: p.productoLab ?? p.laboratorio ?? p.lab ?? undefined,   
   productoEstado: p.productoEstado ?? p.estado ?? undefined,         
   productoStkfra: Number(p.productoStkfra ?? p.stkfra ?? 0),    
-  PVP_F: Number(p.PVP_F ?? p.precio ?? 0),  // ✅ AGREGAR
+  PVP_F: Number(p.PVP_F ?? p.precio ?? 0), 
   stockAlm_m: Number(p.stockAlm_m ?? p.stock ?? 0),
   PVP_F_U: Number(p.PVP_F_U ?? 0),
+  canven: Number(p.canven ?? 1)
 }));
 
 

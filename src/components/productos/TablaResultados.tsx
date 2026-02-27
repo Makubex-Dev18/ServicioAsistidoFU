@@ -41,6 +41,7 @@ export default function TablaResultados({
               <th className="px-3 py-2 text-right text-sm font-semibold">Dcto</th>
               <th className="px-3 py-2 text-right text-sm font-semibold">PVP+F</th>
               <th className="px-3 py-2 text-center text-sm font-semibold">CantE</th>
+              <th className="px-3 py-2 text-center text-sm font-semibold">CantM</th>
               <th className="px-3 py-2 text-center text-sm font-semibold">🔍</th>
             </tr>
           </thead>
@@ -99,6 +100,20 @@ export default function TablaResultados({
                         {producto.stkalm}
                       </span>
                     </td>
+                    
+                    <td className="px-3 py-2 text-sm text-center">
+                      <span className={`
+                        inline-block px-2 py-1 rounded text-xs font-semibold
+                        ${producto.stkalm_m > 0 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                        }
+                      `}>
+                        {producto.stkalm_m}
+                      </span>
+                    </td>
+
+
                     <td className="px-3 py-2 text-center">
                       {producto.codinf && producto.codinf !== '00000' && (
                         <button className="text-blue-600 hover:text-blue-800">

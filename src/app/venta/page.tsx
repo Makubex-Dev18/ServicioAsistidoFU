@@ -113,11 +113,12 @@ export default function VentaPage() {
       }
 
       // ✅ Agregar nuevo item con tipo de venta
-      const etiquetaTipo = tipoVenta === 'fraccion' ? ' (UNIDAD)' : ' (CAJA)';
+      //const etiquetaTipo = tipoVenta === 'fraccion' ? ' (UNIDAD)' : ' (CAJA)';
+      const etiquetaTipo = tipoVenta === 'fraccion' ? ' (Fraccion)' : ' (Entero)';
       
       const nuevoItem: ItemCarrito = {
         codigo: producto.codigo,
-        descripcion: `${producto.descripcion}${etiquetaTipo}`,
+        descripcion: `${producto.descripcion} - ${etiquetaTipo}`,
         precio: precioFinal,
         cantidad: 1,
         subtotal: precioFinal,

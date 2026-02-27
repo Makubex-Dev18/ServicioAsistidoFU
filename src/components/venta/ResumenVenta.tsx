@@ -40,6 +40,9 @@ export default function ResumenVenta({
  const base = total - igv;         // Base imponible (sin IGV)
 
   const handleGenerarTicket = () => {
+    const confirmacion = window.confirm("¿Esta seguro de guardar el carrito?");
+    if(!confirmacion) return 
+
     if (items.length === 0) return;
     
     // Guardar en localStorage o state global
@@ -52,7 +55,7 @@ export default function ResumenVenta({
     }));
     
     // Navegar a resumen
-    router.push('/resumen');
+    router.push('/ventaResumen');
   };
 
   console.log('items del carrito:', items) // para ver la estructura real
